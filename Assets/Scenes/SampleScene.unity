@@ -31477,7 +31477,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _data:
-    _json: '{"declarations":{"collection":{"$content":[{"name":"selected Object","value":null,"$version":"A"},{"name":"hex","value":null,"$version":"A"},{"name":"unit","value":{"$content":0,"$type":"UnityEngine.Object"},"$version":"A"},{"name":"destination","value":{"$content":[],"$type":"System.Collections.Generic.List`1[[UnityEngine.Vector3,
+    _json: '{"declarations":{"collection":{"$content":[{"name":"selected Object","value":null,"$version":"A"},{"name":"hex","value":null,"$version":"A"},{"name":"unit","value":{"$content":0,"$type":"UnityEngine.Object"},"$version":"A"},{"name":"range","value":{"$content":[],"$type":"System.Collections.Generic.List`1[[UnityEngine.Vector3,
+      UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]"},"$version":"A"},{"name":"destination","value":{"$content":[],"$type":"System.Collections.Generic.List`1[[UnityEngine.Vector3,
       UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]"},"$version":"A"},{"name":"path1","value":{"$content":[],"$type":"System.Collections.Generic.List`1[[UnityEngine.Vector3,
       UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]"},"$version":"A"},{"name":"Map","value":{"$type":"Ludiq.AotDictionary"},"$version":"A"}],"$version":"A"},"$version":"A"}}'
     _objectReferences:

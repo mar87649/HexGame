@@ -128,10 +128,10 @@ public class HexTools
         }
         return results;
     } 
-    public List<Vector3> pathFind(GameObject startCell, GameObject goalCell, Dictionary<Vector3, GameObject> hexMap)
+    public List<Vector3> pathFind(Vector3 start, Vector3 goal, Dictionary<Vector3, GameObject> hexMap)
         {
-            Vector3 start = startCell.GetComponent<HexCell>().Cordinates;
-            Vector3 goal = goalCell.GetComponent<HexCell>().Cordinates;
+            // Vector3 start = startCell.GetComponent<HexCell>().Cordinates;
+            // Vector3 goal = goalCell.GetComponent<HexCell>().Cordinates;
             SimplePriorityQueue<Vector3> frontier = new SimplePriorityQueue<Vector3>();
             Dictionary<Vector3, Vector3> cameFrom = new Dictionary<Vector3, Vector3>();
             Dictionary<Vector3, int> costSoFar = new Dictionary<Vector3, int>();
