@@ -7,11 +7,9 @@ using UnityEditor;
 public class UnitProps : MonoBehaviour
 {
     public HexTools HexTools;   
-    [SerializeField]
-    private int health;
+    [SerializeField]private int health;
     public int Health{ get; set;}
-    [SerializeField]
-    private int moveRange;
+    [SerializeField]private int moveRange;
     public int MoveRange{
         get
         {
@@ -24,34 +22,71 @@ public class UnitProps : MonoBehaviour
             moveRange = value;
         }
     }
-    [SerializeField]
-    private int attack;
-    public int Attack{ get; set;}
-    private Vector3 cordPosition;
-    public Vector3 CordPosition    {
+
+    [SerializeField]private int attackRange;
+    public int AttackRange{
         get
         {
             //Some other code
-            return cordPosition;
+            return attackRange;
         }
         set
         {
             //Some other code
-            cordPosition = value;
+            attackRange = value;
         }
     }
- 
-
-
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField]private int attack;
+    public int Attack{ get; set;}
+    [SerializeField]private float  orientation;
+    public float  Orientation    {
+        get
+        {
+            return orientation;
+        }
+        set
+        {
+            orientation = value;
+            transform.localRotation = Quaternion.Euler(0f, value, 0f);          
+        }
+    }
+    [SerializeField]private List<string> bypassList;
+    public List<string> BypassList{get; set;}
+    [SerializeField] private GameObject hexCell;
+    public GameObject HexCell{
+        get{ return hexCell;}
+        set{ hexCell = value;}
+    }
+    [SerializeField]private Vector3 cordPosition;
+    public Vector3 CordPosition    {
+        get
+        {
+            return cordPosition;
+        }
+        private set
+        {            
+            
+        }
+    }
+    [SerializeField]private string type;
+    public string Type{        
+        get{ return type;}
+        set{ type = value;}
+    }
+    [SerializeField]private string faction;
+    public string Faction{        
+        get{ return faction;}
+        set{ faction = value;}
+    }
+        void Start()
     {
-        cordPosition = HexTools.rect2Cube(gameObject.transform.position);
     }
 
     // Update is called once per frame
     void Update() 
     {
-        cordPosition = HexTools.rect2Cube(gameObject.transform.position);
+        cordPosition = HexTools.rect2Cube(transform.position);
+
+        
     }
 }

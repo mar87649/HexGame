@@ -33,10 +33,19 @@ public class HexTools
 
         return new Vector3(x, y, z);
     }
+    public bool reachableHex(Vector3 hex, Dictionary<Vector3, GameObject> hexGrid, bool includeImpassable = false){
 
+        if(hexGrid.ContainsKey(hex))
+        {///and
+            if(hexGrid[hex].GetComponent<HexCell>().Passable || includeImpassable) 
+            {
+                return true;
+            }                
+        } 
+        return false; 
+    }
     public List<Vector3> neighbors(Vector3 hex, Dictionary<Vector3, GameObject> hexGrid){   
-        //hexGrid = GameObject.Find("HexGrid").GetComponent<HexMap>().HexGrid;     
-        // Vector3 cords = hex.GetComponent<HexCell>().Cordinates;        
+   
         List<Vector3> results = new List<Vector3>();
         Vector3[] diretions = new [] {
             new Vector3(1, -1, 0),
@@ -49,16 +58,10 @@ public class HexTools
         foreach(Vector3 direction in diretions){ 
             Vector3 current = hex + direction; 
 
-            if(reachable(current, hexGrid)){
+            //if(reachableHex(current, hexGrid, includeImpassable)){
+            if(hexGrid.ContainsKey(hex)){
                 results.Add(hex + direction);
-            }
-            // if(hexGrid.ContainsKey(current))
-            // {///and
-            //     if(hexGrid[current].GetComponent<HexCell>().Passable)
-            //     {
-            //         results.Add(hex + direction);
-            //     }                
-            // }   
+            }  
         }
         return results;
     }
@@ -85,38 +88,7 @@ public class HexTools
         }
         return new Vector3(rx, ry, rz);
     }
-
-    public Vector3 cubeLerp(Vector3 a, Vector3 b, float t){
-        return new Vector3(
-            Mathf.Lerp(a.x, b.x, t),
-            Mathf.Lerp(a.y, b.y, t),
-            Mathf.Lerp(a.z, b.z, t)
-            );
-    }
-
-    // // public List<Vector3> line(Vector3 hex1, Vector3 hex2){
-    // //     int N = distance(hex1, hex2);
-    // //     List<Vector3> results = new List<Vector3>();
-    // //     foreach (int i in Enumerable.Range(0, N))
-    // //     {
-    // //         results.Add(cubeRound(cubeLerp(hex1, hex2, 1/N*i)));
-    // //     }
-
-    // //     return results;
-    // // }
-
-    // public List<Vector3> line(Vector3 hex1, Vector3 hex2){
-    //     int N = distance(hex1, hex2);
-    //     List<Vector3> results = new List<Vector3>();
-    //     foreach (int i in Enumerable.Range(0, N))
-    //     {
-    //         results.Add(cubeRound(Vector3.Lerp(hex1, hex2, (1f/N*i))));
-    //     }
-
-    //     return results;
-    // }
-
-    public List<Vector3> moveRange(Vector3 hex, int N){
+    public List<Vector3> hexRange(Vector3 hex, int N){
         List<Vector3> results = new List<Vector3>();
         for (int x = -N; x <= N; x++)
         {
@@ -128,16 +100,16 @@ public class HexTools
         }
         return results;
     } 
-    public List<Vector3> pathFind(Vector3 start, Vector3 goal, Dictionary<Vector3, GameObject> hexMap)
+    public List<Vector3> pathFind(GameObject unit, GameObject goalHex, Dictionary<Vector3, GameObject> hexMap)
         {
-            // Vector3 start = startCell.GetComponent<HexCell>().Cordinates;
-            // Vector3 goal = goalCell.GetComponent<HexCell>().Cordinates;
+            Vector3 start = unit.GetComponent<UnitProps>().CordPosition;
+            Vector3 goal = goalHex.GetComponent<HexCell>().Cordinates;
             SimplePriorityQueue<Vector3> frontier = new SimplePriorityQueue<Vector3>();
             Dictionary<Vector3, Vector3> cameFrom = new Dictionary<Vector3, Vector3>();
             Dictionary<Vector3, int> costSoFar = new Dictionary<Vector3, int>();
             List<Vector3> path = new List<Vector3>();
             Vector3 current;
-
+            
             frontier.Enqueue(start, 0);
             cameFrom.Add(start, default(Vector3));
             costSoFar.Add(start, 0);
@@ -148,7 +120,16 @@ public class HexTools
                     break;
                 }                
                 foreach(Vector3 next in neighbors(current, hexMap)){
-                    int newCost = costSoFar[current] + hexMap[current].GetComponent<HexCell>().Cost;
+                    //check if neighbor contain a unit
+                    //if true, check if units are enemies
+                    //if true, skip neighbor, else continue
+                    if(hexMap[next].GetComponent<HexCell>().Unit != null){
+                        if(areEnemies(unit, hexMap[next].GetComponent<HexCell>().Unit)){
+                            continue;
+                        }
+                    }                    
+
+                    int newCost = costSoFar[current] + hexMap[current].GetComponent<HexCell>().Cost;                    
                     if(!costSoFar.ContainsKey(next) || newCost<costSoFar[next]){
                         costSoFar[next] = newCost;
                         int priority = newCost + Heruistic(goal, next);
@@ -162,27 +143,183 @@ public class HexTools
                 path.Add(current);
                 current = cameFrom[current];
             } 
+            path.Add(start);
             path.Reverse();
             return path;
         } 
-        public int Heruistic(Vector3 p1, Vector3 p2)
+    public int Heruistic(Vector3 p1, Vector3 p2)
         {
             return (int)(Math.Abs(p1.x-p2.x) + Math.Abs(p1.y - p2.y) + Math.Abs(p1.z - p2.z));
         } 
-    public bool reachable(Vector3 hex, Dictionary<Vector3, GameObject> hexGrid, bool includeImpassable = false){
+    public List<Vector3> searchRange(GameObject Object, int range, Dictionary<Vector3, GameObject> hexMap){
+       
 
-        if(hexGrid.ContainsKey(hex))
-        {///and
-            if(hexGrid[hex].GetComponent<HexCell>().Passable || includeImpassable) 
-            {
+        Vector3 start = rect2Cube(Object.transform.position);
+        List<Vector3> visited = new List<Vector3>();
+        List<List<Vector3>> fringes = new List<List<Vector3>>();
+        visited.Add(start);
+        fringes.Add(new List<Vector3>(){start});
+
+        for (int k = 1; k <= range; k++){
+            fringes.Add(new List<Vector3>(){});
+            foreach(Vector3 hex in fringes[k-1]){                    
+                foreach(Vector3 neighbor in neighbors(hex, hexMap)){
+                    if(!visited.Contains(neighbor)){ 
+                        visited.Add(neighbor);
+                        fringes[k].Add(neighbor);
+                    }
+                }
+            }
+        }
+        return visited;
+    }
+
+    public List<Vector3> unitRange(GameObject unit, int range, Dictionary<Vector3, GameObject> hexMap){
+       
+        Vector3 start = rect2Cube(unit.transform.position);
+        List<Vector3> visited = new List<Vector3>();
+        List<List<Vector3>> fringes = new List<List<Vector3>>();
+        visited.Add(start);
+        fringes.Add(new List<Vector3>(){start});
+
+        for (int k = 1; k <= range; k++){
+            fringes.Add(new List<Vector3>(){});
+            foreach(Vector3 hex in fringes[k-1]){                    
+                foreach(Vector3 neighbor in neighbors(hex, hexMap)){
+                    //check if neighbor contain a unit
+                    //if true, check if units are enemies
+                    //if true, skip neighbor, else continue
+                    if(hexMap[neighbor].GetComponent<HexCell>().Unit != null){
+                        if(areEnemies(unit, hexMap[neighbor].GetComponent<HexCell>().Unit)){                            
+                            continue;
+                        }
+                    }
+                    if(!visited.Contains(neighbor)){ 
+                        visited.Add(neighbor);
+                        fringes[k].Add(neighbor);
+                    }
+                }
+            }
+        }
+        return visited;
+    }
+
+    public List<Vector3> attackRange(GameObject unit, int range, Dictionary<Vector3, GameObject> hexMap){
+        Vector3 start = rect2Cube(unit.transform.position);
+        List<Vector3> visited = new List<Vector3>();
+        List<List<Vector3>> fringes = new List<List<Vector3>>();
+        visited.Add(start);
+        fringes.Add(new List<Vector3>(){start});
+
+        for (int k = 1; k <= range; k++){
+            fringes.Add(new List<Vector3>(){});
+            foreach(Vector3 hex in fringes[k-1]){                    
+                foreach(Vector3 neighbor in neighbors(hex, hexMap)){
+                    //check if neighbor contain a blocked cell
+                    //if true, skip neighbor, else continue
+                    if(hexMap[neighbor].GetComponent<HexCell>().Blocked){
+                            continue;
+                    }
+                    if(!visited.Contains(neighbor)){ 
+                        visited.Add(neighbor);
+                        fringes[k].Add(neighbor);
+                    }
+                }
+            }
+        }
+        return visited;
+    } 
+
+    //============================================================
+
+    
+    
+    public bool areEnemies(GameObject unitA, GameObject unitB){
+        string factionA = unitA.GetComponent<UnitProps>().Faction;
+        string factionB = unitB.GetComponent<UnitProps>().Faction;
+        if(factionA == factionB){
+            return false;
+        }else
+        {
+            return true;
+        }
+    }
+    public bool blockedByUnitType(GameObject hex, GameObject unit){
+        if(hex.GetComponent<HexCell>().Unit != null){
+            foreach(string bypass in unit.GetComponent<UnitProps>().BypassList){
+                if(hex.GetComponent<HexCell>().Unit.GetComponent<UnitProps>().Type.Equals(bypass)){
+                    return true;                        
+                }
+            }
+        }          
+        return false;
+    }
+
+    public bool hexIsPassable(GameObject hex, Dictionary<Vector3, GameObject> hexGrid){
+        Vector3 hexCords = hex.GetComponent<HexCell>().Cordinates;
+
+        if(hexGrid.ContainsKey(hexCords)){///and
+            if(hexGrid[hexCords].GetComponent<HexCell>().Passable){
                 return true;
             }                
         } 
         return false; 
+        }
+
+    public void passableCheck(List<Action> methodList){
+        foreach(Action method in methodList){
+            method();
+        }
     }
 
+    
 
-}    
+
+
+}   
+
+    // public List<Vector3> pathFind(Vector3 start, Vector3 goal, Dictionary<Vector3, GameObject> hexMap)
+    //     {
+    //         // Vector3 start = startCell.GetComponent<HexCell>().Cordinates;
+    //         // Vector3 goal = goalCell.GetComponent<HexCell>().Cordinates;
+    //         SimplePriorityQueue<Vector3> frontier = new SimplePriorityQueue<Vector3>();
+    //         Dictionary<Vector3, Vector3> cameFrom = new Dictionary<Vector3, Vector3>();
+    //         Dictionary<Vector3, int> costSoFar = new Dictionary<Vector3, int>();
+    //         List<Vector3> path = new List<Vector3>();
+    //         Vector3 current;
+    //         //ReachableConditions reachableCondition = new ReachableConditions();
+            
+    //         frontier.Enqueue(start, 0);
+    //         cameFrom.Add(start, default(Vector3));
+    //         costSoFar.Add(start, 0);
+
+    //         while(frontier.Count > 0){
+    //             current  = frontier.Dequeue();
+    //             if(current.Equals(goal)){
+    //                 break;
+    //             }                
+    //             foreach(Vector3 next in neighbors(current, hexMap)){
+    //                 int newCost = costSoFar[current] + hexMap[current].GetComponent<HexCell>().Cost;
+    //                 if(!costSoFar.ContainsKey(next) || newCost<costSoFar[next]){
+    //                     costSoFar[next] = newCost;
+    //                     int priority = newCost + Heruistic(goal, next);
+    //                     frontier.Enqueue(next, priority);
+    //                     cameFrom[next] = current;
+    //                 }
+    //             }
+    //         }
+    //         current = goal;
+    //         while(current != start){
+    //             path.Add(current);
+    //             current = cameFrom[current];
+    //         } 
+    //         path.Add(start);
+    //         path.Reverse();
+    //         return path;
+    //     } 
+
+
+    
 
 
 

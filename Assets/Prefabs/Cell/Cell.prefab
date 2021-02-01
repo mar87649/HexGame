@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8594817823401363080}
   - component: {fileID: -7809553754442718346}
+  - component: {fileID: 3362987104623656161}
   - component: {fileID: 6140877921300386780}
   - component: {fileID: 4957050147295549519}
   - component: {fileID: 8704874740675885378}
@@ -48,10 +49,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1685d64ed8f6d054a9591021d491bf38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Cordinates: {x: 0, y: 0, z: 0}
-  Passable: 1
-  Cost: 1
-  Terrain: land
+  cordinates: {x: 0, y: 0, z: 0}
+  passable: 0
+  cost: 0
+  terrain: 
+  blocked: 0
+  unit: {fileID: 0}
+  obj: {fileID: 0}
+--- !u!114 &3362987104623656161
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7893157402236139781}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 117fc7e4c6a57704c8869ca2baea0b15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  type: cell
 --- !u!33 &6140877921300386780
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -143,6 +160,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _data:
-    _json: '{"nest":{"source":"Macro","macro":0,"embed":null}}'
-    _objectReferences:
-    - {fileID: 11400000, guid: c246d4509c754ce43ad587940d6a5eeb, type: 2}
+    _json: '{"nest":{"source":"Macro","macro":null,"embed":null}}'
+    _objectReferences: []

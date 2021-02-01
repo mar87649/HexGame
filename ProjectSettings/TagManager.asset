@@ -4,11 +4,18 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - stateText
-  - hex1Text
-  - hex2Text
-  - hexlistText
   - Map
+  - player
+  - enemy
+  - unitMenu
+  - unitMenu_END
+  - unitMenu_ATTACK
+  - hex1Text
+  - stateText
+  - unitMenu_DEFEND
+  - hexlistText
+  - hex2Text
+  - unitMenu_CAST
   layers:
   - Default
   - TransparentFX
@@ -45,4 +52,7 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: New Layer
+    uniqueID: 891266615
     locked: 0

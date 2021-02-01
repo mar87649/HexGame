@@ -7,6 +7,18 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -7809553754442718346, guid: 622c6610791358d4d8450d3dc26de72c, type: 3}
+      propertyPath: cost
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -7809553754442718346, guid: 622c6610791358d4d8450d3dc26de72c, type: 3}
+      propertyPath: terrain
+      value: land
+      objectReference: {fileID: 0}
+    - target: {fileID: -7809553754442718346, guid: 622c6610791358d4d8450d3dc26de72c, type: 3}
+      propertyPath: passable
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4957050147295549519, guid: 622c6610791358d4d8450d3dc26de72c, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
